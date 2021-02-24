@@ -58,7 +58,10 @@ fn main() -> std::io::Result<()> {
                 }
             }
 
-            update_schema(&client, &schema_url)
+            // commenting this since it's broken right now.
+            // update_schema(&client, &schema_url)
+
+            Ok(())
         }
     } else {
         Ok(())
