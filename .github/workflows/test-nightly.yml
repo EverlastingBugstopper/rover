@@ -20,7 +20,7 @@ jobs:
             os: ubuntu-latest
             rust: nightly
           - build: macos-nightly
-            os: macos-latest
+            os: macos-11.0
             rust: nightly
           - build: windows-nightly
             os: windows-latest
