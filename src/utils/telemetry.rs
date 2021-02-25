@@ -2,15 +2,13 @@ use url::Url;
 
 use std::path::PathBuf;
 
-use crate::cli::Rover;
 use crate::utils::env::RoverEnvKey;
+use crate::{cli::Rover, PKG_NAME, PKG_VERSION};
 use sputnik::{Command, Report, SputnikError};
 
 use std::collections::HashMap;
 
 const TELEMETRY_URL: &str = "https://install.apollographql.workers.dev/telemetry";
-const ROVER_VERSION: &str = env!("CARGO_PKG_VERSION");
-const ROVER_NAME: &str = env!("CARGO_PKG_NAME");
 
 fn get_command_from_args(mut raw_arguments: &mut serde_json::Value) -> Command {
     let mut commands = Vec::new();
@@ -98,11 +96,11 @@ impl Report for Rover {
     }
 
     fn tool_name(&self) -> String {
-        ROVER_NAME.to_string()
+        PKG_NAME.to_string()
     }
 
     fn version(&self) -> String {
-        ROVER_VERSION.to_string()
+        PKG_VERSION.to_string()
     }
 
     fn machine_id_config(&self) -> Result<PathBuf, SputnikError> {
