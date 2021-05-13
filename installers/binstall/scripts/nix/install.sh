@@ -16,7 +16,7 @@ BINARY_DOWNLOAD_PREFIX="https://github.com/apollographql/rover/releases/download
 # Rover version defined in root cargo.toml
 # Note: this line is built automatically
 # in build.rs. Don't touch it!
-PACKAGE_VERSION="v0.0.4"
+PACKAGE_VERSION="v0.1.0"
 
 download_binary_and_run_installer() {
     downloader --check
@@ -29,7 +29,6 @@ download_binary_and_run_installer() {
     need_cmd tar
     need_cmd which
     need_cmd dirname
-    need_cmd tput
 
     # if $VERSION isn't provided or has 0 length, use version from Rover cargo.toml
     # ${VERSION:-} checks if version exists, and if doesn't uses the default
@@ -52,6 +51,9 @@ download_binary_and_run_installer() {
         *windows*)
             _ext=".exe"
             ;;
+        *linux*)
+            need_glibc
+            ;;
     esac
 
     local _tardir="rover-$DOWNLOAD_VERSION-${_arch}"
@@ -69,7 +71,7 @@ download_binary_and_run_installer() {
       say "this may be a standard network error, but it may also indicate"
       say "that rover's release process is not working. When in doubt"
       say "please feel free to open an issue!"
-      say "https://github.com/apollographql/rover/issues/new"
+      say "https://github.com/apollographql/rover/issues/new/choose"
       exit 1
     fi
 
@@ -105,7 +107,7 @@ get_architecture() {
 
     if [ "$_ostype" = Darwin -a "$_cputype" = arm64 ]; then
         # Darwin `uname -s` doesn't seem to lie on Big Sur
-        # but we want to serve x86_64 binaries anyway that they can
+        # but we want to serve x86_64 binaries anyway so that they can
         # then run in x86_64 emulation mode on their arm64 devices
         local _cputype=x86_64
     fi
@@ -143,16 +145,22 @@ get_architecture() {
 
 
 say() {
-    local green=`tput setaf 2`
-    local reset=`tput sgr0`
+    local green=`tput setaf 2 2>/dev/null || echo ''`
+    local reset=`tput sgr0 2>/dev/null || echo ''`
     echo "$1"
 }
 
 err() {
-    local red=`tput setaf 1`
-    local reset=`tput sgr0`
+    local red=`tput setaf 1 2>/dev/null || echo ''`
+    local reset=`tput sgr0 2>/dev/null || echo ''`
     say "${red}ERROR${reset}: $1" >&2
     exit 1
+}
+
+need_glibc() {
+    if ! check_cmd "/lib/x86_64-linux-gnu/libc.so.6"
+    then err "could not link against 'glibc'. Do you have glibc >= 2.7 installed?"
+    fi
 }
 
 need_cmd() {

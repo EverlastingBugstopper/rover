@@ -31,20 +31,18 @@ pub fn check_for_update(config: config::Config, force: bool) -> Result<()> {
         do_update_check(&mut checked, force)?;
     } else if let Some(last_checked_time) = last_checked_time {
         let time_since_check = current_time.duration_since(last_checked_time)?.as_secs();
-        tracing::debug!(
+        tracing::trace!(
             "Time since last update check: {:?}h",
             time_since_check / ONE_HOUR
         );
 
         if time_since_check > ONE_DAY {
             do_update_check(&mut checked, force)?;
-        } else {
-            tracing::debug!("No need to check for updates. Automatic checks happen once per day");
         }
     }
 
     if checked {
-        tracing::debug!("Checked for available updates. Writing current time to disk");
+        tracing::trace!("Checked for available updates. Writing current time to disk");
         fs::write(&version_file, toml::to_string(&current_time)?)?;
     }
 
@@ -53,12 +51,12 @@ pub fn check_for_update(config: config::Config, force: bool) -> Result<()> {
 
 fn do_update_check(checked: &mut bool, should_output_if_updated: bool) -> Result<()> {
     let latest = get_latest_release()?;
+    let pretty_latest = Cyan.normal().paint(format!("v{}", latest));
     let update_available = is_latest_newer(&latest, PKG_VERSION)?;
-
     if update_available {
         let message = format!(
             "There is a newer version of Rover available: {} (currently running v{})\n\nFor instructions on how to install, run {}", 
-            Cyan.normal().paint(format!("v{}", latest)), 
+            &pretty_latest,
             PKG_VERSION,
             Yellow.normal().paint("`rover docs open start`")
         );
@@ -67,7 +65,10 @@ fn do_update_check(checked: &mut bool, should_output_if_updated: bool) -> Result
             .build()
             .eprint(message);
     } else if should_output_if_updated {
-        eprintln!("Rover is up to date!");
+        eprintln!(
+            "Rover is up to date with the latest release {}.",
+            &pretty_latest
+        );
     }
 
     *checked = true;

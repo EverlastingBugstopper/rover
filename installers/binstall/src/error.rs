@@ -6,7 +6,7 @@ use std::io;
 #[derive(Error, Debug)]
 pub enum InstallerError {
     #[error(transparent)]
-    IOError(#[from] io::Error),
+    IoError(#[from] io::Error),
 
     #[error("Could not find the home directory of the current user")]
     NoHomeUnix,
@@ -17,6 +17,6 @@ pub enum InstallerError {
     #[error("Zsh setup failed")]
     ZshSetup,
 
-    #[error("File path \"{path_display}\" is not valid Unicode")]
-    PathNotUnicode { path_display: String },
+    #[error(transparent)]
+    PathNotUtf8(#[from] camino::FromPathBufError),
 }

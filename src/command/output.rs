@@ -1,10 +1,12 @@
-use std::collections::HashMap;
 use std::fmt::Debug;
-
-use ansi_term::Colour::Yellow;
-use rover_client::query::subgraph::list::ListDetails;
+use std::{collections::HashMap, fmt::Display};
 
 use crate::utils::table::{self, cell, row};
+use ansi_term::{Colour::Yellow, Style};
+use atty::Stream;
+use crossterm::style::Attribute::Underlined;
+use rover_client::query::subgraph::list::ListDetails;
+use termimad::MadSkin;
 
 /// RoverStdout defines all of the different types of data that are printed
 /// to `stdout`. Every one of Rover's commands should return `anyhow::Result<RoverStdout>`
@@ -17,13 +19,16 @@ use crate::utils::table::{self, cell, row};
 #[derive(Clone, PartialEq, Debug)]
 pub enum RoverStdout {
     DocsList(HashMap<&'static str, &'static str>),
-    SDL(String),
-    CSDL(String),
+    SupergraphSdl(String),
+    Sdl(String),
+    CoreSchema(String),
     SchemaHash(String),
     SubgraphList(ListDetails),
     VariantList(Vec<String>),
     Profiles(Vec<String>),
     Introspection(String),
+    Markdown(String),
+    PlainText(String),
     None,
 }
 
@@ -44,17 +49,21 @@ impl RoverStdout {
                 }
                 println!("{}", table);
             }
-            RoverStdout::SDL(sdl) => {
-                eprintln!("SDL:");
-                println!("{}", &sdl);
+            RoverStdout::SupergraphSdl(sdl) => {
+                print_descriptor("Supergraph SDL");
+                print_content(&sdl);
             }
-            RoverStdout::CSDL(csdl) => {
-                eprintln!("CSDL:");
-                println!("{}", &csdl);
+            RoverStdout::Sdl(sdl) => {
+                print_descriptor("SDL");
+                print_content(&sdl);
+            }
+            RoverStdout::CoreSchema(csdl) => {
+                print_descriptor("CoreSchema");
+                print_content(&csdl);
             }
             RoverStdout::SchemaHash(hash) => {
-                eprint!("Schema Hash: ");
-                println!("{}", &hash);
+                print_one_line_descriptor("Schema Hash");
+                print_content(&hash);
             }
             RoverStdout::SubgraphList(details) => {
                 let mut table = table::get_table();
@@ -63,10 +72,13 @@ impl RoverStdout {
                 table.add_row(row![bc => "Name", "Routing Url", "Last Updated"]);
 
                 for subgraph in &details.subgraphs {
-                    // if the url is None or empty (""), then set it to "N/A"
-                    let url = subgraph.url.clone().unwrap_or_else(|| "N/A".to_string());
+                    // Default to "unspecified" if the url is None or empty.
+                    let url = subgraph
+                        .url
+                        .clone()
+                        .unwrap_or_else(|| "unspecified".to_string());
                     let url = if url.is_empty() {
-                        "N/A".to_string()
+                        "unspecified".to_string()
                     } else {
                         url
                     };
@@ -86,7 +98,7 @@ impl RoverStdout {
                 );
             }
             RoverStdout::VariantList(variants) => {
-                eprintln!("Variants:");
+                print_descriptor("Variants");
                 for variant in variants {
                     println!("{}", variant);
                 }
@@ -95,7 +107,7 @@ impl RoverStdout {
                 if profiles.is_empty() {
                     eprintln!("No profiles found.");
                 } else {
-                    eprintln!("Profiles:")
+                    print_descriptor("Profiles")
                 }
 
                 for profile in profiles {
@@ -103,10 +115,42 @@ impl RoverStdout {
                 }
             }
             RoverStdout::Introspection(introspection_response) => {
-                eprintln!("Introspection Response:");
-                println!("{}", &introspection_response);
+                print_descriptor("Introspection Response");
+                print_content(&introspection_response);
+            }
+            RoverStdout::Markdown(markdown_string) => {
+                // underline bolded md
+                let mut skin = MadSkin::default();
+                skin.bold.add_attr(Underlined);
+
+                println!("{}", skin.inline(&markdown_string));
+            }
+            RoverStdout::PlainText(text) => {
+                println!("{}", text);
             }
             RoverStdout::None => (),
         }
+    }
+}
+
+fn print_descriptor(descriptor: impl Display) {
+    if atty::is(Stream::Stdout) {
+        eprintln!("{}: \n", Style::new().bold().paint(descriptor.to_string()));
+    }
+}
+fn print_one_line_descriptor(descriptor: impl Display) {
+    if atty::is(Stream::Stdout) {
+        eprint!("{}: ", Style::new().bold().paint(descriptor.to_string()));
+    }
+}
+
+/// if the user is outputting to a terminal, we want there to be a terminating
+/// newline, but we don't want that newline to leak into output that's piped
+/// to a file, like from a `graph fetch`
+fn print_content(content: impl Display) {
+    if atty::is(Stream::Stdout) {
+        println!("{}", content)
+    } else {
+        print!("{}", content)
     }
 }

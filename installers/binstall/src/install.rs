@@ -52,7 +52,7 @@ impl Installer {
         Ok(base_dir.join(&format!(".{}", &self.binary_name)))
     }
 
-    pub(crate) fn get_bin_dir_path(&self) -> Result<Utf8PathBuf, InstallerError> {
+    pub fn get_bin_dir_path(&self) -> Result<Utf8PathBuf, InstallerError> {
         let bin_dir = self.get_base_dir_path()?.join("bin");
         Ok(bin_dir)
     }
@@ -71,8 +71,14 @@ impl Installer {
 
     fn write_bin_to_fs(&self) -> Result<(), InstallerError> {
         let bin_path = self.get_bin_path()?;
-        tracing::debug!("copying from: {}", &self.executable_location);
-        tracing::debug!("copying to: {}", &bin_path);
+        tracing::debug!(
+            "copying \"{}\" to \"{}\"",
+            &self.executable_location,
+            &bin_path
+        );
+        // attempt to remove the old binary
+        // but do not error if it doesn't exist.
+        let _ = fs::remove_file(&bin_path);
         fs::copy(&self.executable_location, &bin_path)?;
         Ok(())
     }

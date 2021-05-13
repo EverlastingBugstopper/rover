@@ -17,7 +17,7 @@ jobs:
           ]
         include:
           - build: linux-nightly
-            os: ubuntu-latest
+            os: ubuntu-16.04
             rust: nightly
           - build: macos-nightly
             os: macos-latest
@@ -30,23 +30,26 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Cache Cargo registry
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.cargo/registry
           key: ${{ matrix.build }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ matrix.build }}-cargo-registry-
+
       - name: Cache Cargo index
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.cargo/git
           key: ${{ matrix.build }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ matrix.build }}-cargo-index-
+            
       - name: Install Rust
         run: |
           rustup update ${{ matrix.rust }} --no-self-update
           rustup default ${{ matrix.rust }}
+
       - name: Run Tests
         run: cargo test --workspace --locked
         env:

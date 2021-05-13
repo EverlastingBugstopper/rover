@@ -21,13 +21,6 @@ pub enum HoustonProblem {
     #[error("Could not find a configuration directory at \"{0}\".")]
     NoConfigFound(String),
 
-    /// PathNotUnicode occurs when Houston encounteres a file path that is not valid UTF-8
-    #[error("File path \"{path_display}\" is not valid Unicode")]
-    PathNotUnicode {
-        /// The display name of the invalid path
-        path_display: String,
-    },
-
     /// ProfileNotFound occurs when a profile with a specified name can't be found.
     #[error("There is no profile named \"{0}\".")]
     ProfileNotFound(String),
@@ -40,6 +33,10 @@ pub enum HoustonProblem {
     #[error("No non-sensitive configuration found for profile \"{0}\".")]
     NoNonSensitiveConfigFound(String),
 
+    /// PathNotUtf8 occurs when Houston encounters a file path that is not valid UTF-8
+    #[error(transparent)]
+    PathNotUtf8(#[from] camino::FromPathBufError),
+
     /// TomlSerialization occurs when a profile's configuration can't be serialized to a String.
     #[error(transparent)]
     TomlSerialization(#[from] toml::ser::Error),
@@ -48,7 +45,7 @@ pub enum HoustonProblem {
     #[error(transparent)]
     TomlDeserialization(#[from] toml::de::Error),
 
-    /// IOError occurs when any given std::io::Error arises.
+    /// IoError occurs when any given std::io::Error arises.
     #[error(transparent)]
-    IOError(#[from] io::Error),
+    IoError(#[from] io::Error),
 }

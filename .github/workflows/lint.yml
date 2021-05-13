@@ -5,9 +5,18 @@ on: [pull_request]
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-16.04
     steps:
       - uses: actions/checkout@v2
+
+      - name: Check for broken Markdown links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          folder-path: 'crates, installers'
+          file-path: './README.md'
+
 
       - name: Install Rust
         run: |
@@ -15,6 +24,23 @@ jobs:
           rustup default stable
           rustup component add rustfmt
           rustup component add clippy
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v2
+        with:
+          path: ~/.cargo/registry
+          key: linux-stable-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            linux-stable-cargo-registry-
+
+      - name: Cache Cargo index
+        uses: actions/cache@v2
+        with:
+          path: ~/.cargo/git
+          key: linux-stable-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            linux-stable-cargo-index-
+
       - name: Check formatting
         run: cargo fmt --all -- --check
 

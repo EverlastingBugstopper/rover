@@ -34,12 +34,10 @@ rover graph check --schema=./path-to-valid-sdl test@cats
 rover graph publish --schema ./path-to-valid-schema test@cats
 ```
 
-
 ## Command-line options
 
 ```console
-$ rover --help
-Rover 0.0.4
+Rover 0.1.0
 
 Rover - Your Graph Companion
 Read the getting started guide by running:
@@ -72,23 +70,25 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-    -l, --log <log-level>     [possible values: error, warn, info, debug, trace]
+    -l, --log <log-level>    Specify Rover's log level [possible values: error, warn, info,
+                             debug, trace]
 
 SUBCOMMANDS:
-    config      Configuration profile commands
-    core        Core schema commands
-    docs        Interact with Rover's documentation
-    graph       Non-federated schema/graph commands
-    help        Prints this message or the help of the given subcommand(s)
-    subgraph    Federated schema/graph commands
-    update      Commands related to updating rover
+    config        Configuration profile commands
+    docs          Interact with Rover's documentation
+    explain       Explain error codes
+    graph         Graph API schema commands
+    help          Prints this message or the help of the given subcommand(s)
+    subgraph      Subgraph schema commands
+    supergraph    Supergraph schema commands
+    update        Commands related to updating rover
 ```
 
 This repo is organized as a [`cargo` workspace], containing several related projects:
 
 - `rover`: Apollo's suite of GraphQL developer productivity tools
 - [`houston`]: utilities for configuring Rover
-- [`robot-panic`]: a fork of [rust-cli/robot-panic] adjusted for Rover
+- [`robot-panic`]: a fork of [`rust-cli/human-panic`] adjusted for Rover
 - [`rover-client`]: an HTTP client for making GraphQL requests for Rover
 - [`sdl-encoder`]: a crate to encode SDL
 - [`sputnik`]: a crate to aid in collection of anonymous data for Rust CLIs
@@ -97,7 +97,7 @@ This repo is organized as a [`cargo` workspace], containing several related proj
 [`cargo` workspace]: https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html
 [`houston`]: https://github.com/apollographql/rover/tree/main/crates/houston
 [`robot-panic`]: https://github.com/apollographql/rover/tree/main/crates/robot-panic
-[rust-cli/robot-panic]: https://github.com/rust-cli/robot-panic
+[`rust-cli/human-panic`]: https://github.com/rust-cli/human-panic
 [`rover-client`]: https://github.com/apollographql/rover/tree/main/crates/rover-client
 [`sdl-encoder`]: https://github.com/apollographql/rover/tree/main/crates/sdl-encoder
 [`sputnik`]: https://github.com/apollographql/rover/tree/main/crates/sputnik
@@ -107,28 +107,37 @@ This repo is organized as a [`cargo` workspace], containing several related proj
 
 #### Linux and MacOS `curl | sh` installer
 
-```bash
-curl -sSL https://raw.githubusercontent.com/apollographql/rover/v0.0.4/installers/binstall/scripts/nix/install.sh | sh
-```
-
-**To download older versions of Rover**, use the `VERSION` env variable when executing the installer (note: the `v` in the version number):
+To install the latest release of Rover: 
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/apollographql/rover/v0.0.4/installers/binstall/scripts/nix/install.sh | VERSION=v0.0.1 sh
+curl -sSL https://rover.apollo.dev/nix/latest | sh
 ```
+
+To install a specific version of Rover (note the `v` prefixing the version number):
+
+> Note: If you're installing Rover in a CI environment, it's best to target a specific version rather than using the latest URL, since future major breaking changes could affect CI workflows otherwise.
+
+```bash
+curl -sSL https://rover.apollo.dev/nix/v0.1.0 | sh
+```
+
+You will need `curl` installed on your system to run the above installation commands. You can get the latest version from [the curl downloads page](https://curl.se/download.html).
+
+> Note: Rover is currently not available for Alpine Linux. You may track the progress on getting Rover on Alpine in [this issue](https://github.com/apollographql/rover/issues/375).
 
 #### Windows PowerShell installer
 
 ```bash
-iwr 'https://raw.githubusercontent.com/apollographql/rover/v0.0.4/installers/binstall/scripts/windows/install.ps1' | iex
+iwr 'https://rover.apollo.dev/win/latest' | iex
 ```
 
-**To download older versions of Rover**, use the `VERSION` env variable when executing the installer (note: the `v` in the version number):
+To install a specific version of Rover (note the `v` prefixing the version number):
+
+> Note: If you're installing Rover in a CI environment, it's best to target a specific version rather than using the latest URL, since future major breaking changes could affect CI workflows otherwise.
 
 ```bash
-$Env:VERSION='v0.0.1'; iwr 'https://raw.githubusercontent.com/apollographql/rover/v0.0.4/installers/binstall/scripts/windows/install.ps1' | iex
+iwr 'https://rover.apollo.dev/win/v0.1.0' | iex
 ```
-
 
 #### npm installer
 
