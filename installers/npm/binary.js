@@ -9,7 +9,7 @@ const error = (msg) => {
 };
 
 const { version } = require("./package.json");
-const repository = "https://github.com/apollographql/rover";
+const repository = "https://github.com/EverlastingBugstopper/rover";
 const name = "rover";
 
 const supportedPlatforms = [

@@ -11,7 +11,7 @@
 
 set -u
 
-BINARY_DOWNLOAD_PREFIX="https://github.com/apollographql/rover/releases/download"
+BINARY_DOWNLOAD_PREFIX="https://github.com/EverlastingBugstopper/rover/releases/download"
 
 # Rover version defined in root cargo.toml
 # Note: this line is built automatically
