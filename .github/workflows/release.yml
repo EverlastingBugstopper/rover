@@ -413,9 +413,9 @@ jobs:
         working-directory: ${{ env.npm-dir }}
         run: npm publish
           
-      - name: Publish to npm (prerelease)
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        if: ${{ env.is-prerelease == 'true' }}
-        working-directory: ${{ env.npm-dir }}
-        run: npm publish --tag beta
+      # - name: Publish to npm (prerelease)
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      #   if: ${{ env.is-prerelease == 'true' }}
+      #   working-directory: ${{ env.npm-dir }}
+      #   run: npm publish --tag beta
