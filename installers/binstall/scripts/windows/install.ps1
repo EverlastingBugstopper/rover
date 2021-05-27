@@ -9,7 +9,7 @@
 # version found in Rover's Cargo.toml
 # Note: this line is built automatically
 # in build.rs. Don't touch it!
-$package_version = 'v0.1.3-test.1'
+$package_version = 'v0.1.3-test.2'
 
 function Install-Binary() {
   $old_erroractionpreference = $ErrorActionPreference
@@ -33,7 +33,7 @@ function Install-Binary() {
 }
 
 function Download($version) {
-  $url = "https://github.com/apollographql/rover/releases/download/$version/rover-$version-x86_64-pc-windows-msvc.tar.gz"
+  $url = "https://github.com/EverlastingBugstopper/rover/releases/download/$version/rover-$version-x86_64-pc-windows-msvc.tar.gz"
   "Downloading Rover from $url" | Out-Host
   $tmp = New-Temp-Dir
   $dir_path = "$tmp\rover.tar.gz"
