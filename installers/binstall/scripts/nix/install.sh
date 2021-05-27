@@ -16,7 +16,7 @@ BINARY_DOWNLOAD_PREFIX="https://github.com/EverlastingBugstopper/rover/releases/
 # Rover version defined in root cargo.toml
 # Note: this line is built automatically
 # in build.rs. Don't touch it!
-PACKAGE_VERSION="v0.1.3-test.2"
+PACKAGE_VERSION="v0.1.3-test.3"
 
 download_binary_and_run_installer() {
     downloader --check
