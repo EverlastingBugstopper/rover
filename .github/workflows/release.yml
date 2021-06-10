@@ -218,6 +218,7 @@ jobs:
       #     exit 1
 
       - name: Create Tarball
+        shell: bash
         run: |
           7z a -ttar -so -an ./dist | 7z a -si ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}-${{ steps.get_version.outputs.version }}-${{ matrix.target }}.tar.gz
 
@@ -242,6 +243,10 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v2
 
+      - name: List file structure
+        shell: bash
+        run: ls -R
+
       - name: Unzip binaries
         shell: bash
         run: |
@@ -249,6 +254,10 @@ jobs:
           tar -xzvf ./linux-musl/${{ env.RELEASE_BIN }}-${{ needs.build.outputs.version }}-${{ env.LINUX_MUSL_TARGET }}.tar.gz && mv ./dist/${{ env.RELEASE_BIN }} ./linux-musl-cli && rm -rf dist
           tar -xzvf ./windows/${{ env.RELEASE_BIN }}-${{ needs.build.outputs.version }}-${{ env.WINDOWS_TARGET }}.tar.gz && mv ./dist/${{ env.RELEASE_BIN }}.exe ./windows-cli.exe && rm -rf dist
           tar -xzvf ./macos/${{ env.RELEASE_BIN }}-${{ needs.build.outputs.version }}-${{ env.MACOS_TARGET }}.tar.gz && mv ./dist/${{ env.RELEASE_BIN }} ./macos-cli && rm -rf dist
+
+      - name: List file structure
+        shell: bash
+        run: ls -R
 
       - name: Hash binaries
         id: get_shas
