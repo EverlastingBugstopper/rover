@@ -87,7 +87,7 @@ jobs:
         run: rustup target add ${{ matrix.target }}
 
       - name: Test
-        run: cargo xtask test --verbose
+        run: cargo xtask test --verbose --target ${{ matrix.target }}
 
       - name: Build
         run: cargo xtask dist --verbose --target ${{ matrix.target }}
