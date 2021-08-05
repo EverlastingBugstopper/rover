@@ -86,8 +86,8 @@ jobs:
       - name: Install Rust toolchain
         run: rustup target add ${{ matrix.target }}
 
-      - name: Test
-        run: cargo xtask test --verbose --target ${{ matrix.target }}
+      # - name: Test
+      #   run: cargo xtask test --verbose --target ${{ matrix.target }}
 
       - name: Build
         run: cargo xtask dist --verbose --target ${{ matrix.target }}
@@ -232,7 +232,7 @@ jobs:
         if: matrix.build == 'linux-gnu'
         uses: actions/upload-artifact@v2
         with:
-          name: schema.graphql
+          name: schema
           path: ./crates/rover-client/.schema/schema.graphql
 
   release:
@@ -407,7 +407,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./schema.graphql
+          asset_path: ./schema/schema.graphql
           asset_content_type: text/plain; charset=UTF-8
           asset_name: rover-${{ needs.build.outputs.version }}-schema.graphql
 
